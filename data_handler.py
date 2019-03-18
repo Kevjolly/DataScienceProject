@@ -1,49 +1,67 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from pandas import *
-#todo: generalise the class distribution from unique()
+import pandas as pd
+import sys
+'''
+functions for loading data from csv
+and getting basic attributed of data
+as well as visulisation 
+'''
 
-test = read_csv('Datasets/star_light/test.csv', header=None)
-train = read_csv('Datasets/star_light/train.csv', header=None)
 
-my_class = train
+def csv_to_df(filename):
+    return pd.read_csv(filename, header=None)
 
-class1 = my_class.loc[my_class[0]==1].iloc[:,1:]
-class2 = my_class.loc[my_class[0]==2].iloc[:,1:]
-class3 = my_class.loc[my_class[0]==3].iloc[:,1:]
 
-mean1 = class1.mean(0)
-mean2 = class2.mean(0)
-mean3 = class3.mean(0)
+def unique_classes(df):
+    try:
+        return df[0].unique()
+    except:
+        return df['3'].unique()   # if column names are used
 
-std1 = class1.std(0)
-std2 = class2.std(0)
-std3 = class3.std(0)
 
-max_lim = my_class.max().max()
-min_lim = my_class.min().min()
+def mean_std_of_class(df, class_label):
+    try:
+        current_class = df.loc[df[0]==class_label].iloc[:, 1:]
+    except:
+        current_class = df.loc[df['3']==class_label].iloc[:, 1:]   # if column names are used
+    return current_class.mean(0), current_class.std(0)
 
-fig = plt.figure()
-ax = fig.add_subplot(311)
-ax.set_ylim(min_lim,max_lim)
-plt.plot(np.linspace(0,1,len(mean1)),mean1+std1, 'r-')
-plt.plot(np.linspace(0,1,len(mean1)),mean1-std1, 'r-')
-ax.fill_between(np.linspace(0,1,len(mean1)), mean1-std1, mean1+std1, alpha=0.3)
-plt.plot(np.linspace(0,1,len(mean1)),mean1)
 
-ax = fig.add_subplot(312)
-ax.set_ylim(min_lim,max_lim)
-plt.plot(np.linspace(0,1,len(mean2)),mean2+std2, 'r-')
-plt.plot(np.linspace(0,1,len(mean2)),mean2-std2, 'r-')
-ax.fill_between(np.linspace(0,1,len(mean2)), mean2-std2, mean2+std2, alpha=0.3)
-plt.plot(np.linspace(0,1,len(mean2)),mean2)
+def min_max_of_df(df):
+    return df.min().min(), df.max().max()
 
-#plt.figure()
-ax = fig.add_subplot(313)
-ax.set_ylim(min_lim,max_lim)
-plt.plot(np.linspace(0,1,len(mean3)),mean3+std3, 'r-')
-plt.plot(np.linspace(0,1,len(mean3)),mean3-std3, 'r-')
-ax.fill_between(np.linspace(0,1,len(mean3)), mean3-std3, mean3+std3, alpha=0.3)
-plt.plot(np.linspace(0,1,len(mean3)),mean3)
 
-plt.show()
+def plot_period_std(ax, mean, std):
+    ax.plot(np.linspace(0,1,len(mean)),mean+std, 'r-')
+    ax.plot(np.linspace(0,1,len(mean)),mean-std, 'r-')
+    ax.fill_between(np.linspace(0,1,len(mean)), mean-std, mean+std, alpha=0.3)
+    ax.plot(np.linspace(0,1,len(mean)),mean)
+
+
+def load_plot_data(filename):
+    df = csv_to_df(filename)
+    class_labels = unique_classes(df)
+    print("Class labels of dataset: '"+filename+"' are: "+str(class_labels)+'\n')
+    df_min, df_max = min_max_of_df(df)
+    fig = plt.figure()
+    ax_count = 1
+    for class_label in class_labels:
+        ax = fig.add_subplot(len(class_labels), 1, ax_count)   # count change count to using class_label: assumes classes are ordered 1-n though
+        ax.set_ylim(df_min, df_max)
+        class_mean, class_std = mean_std_of_class(df, class_label)
+        plot_period_std(ax, class_mean, class_std)
+        ax.set_title('Class label: '+str(class_label))
+        if ax_count < len(class_labels):
+            plt.xticks([])   # overlaps with titles
+        ax_count += 1
+    plt.show()
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:   # dataset not given at command line
+        sys.argv.append('Datasets/star_light/train.csv')
+        sys.argv.append('Datasets/star_light/test.csv')
+    for dataset in sys.argv[1:]:
+        load_plot_data(dataset)
+
