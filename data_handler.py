@@ -6,6 +6,9 @@ import sys
 functions for loading data from csv
 and getting basic attributed of data
 as well as visulisation 
+
+call this scipt with n number of filepaths to clean datasets
+(default of OGLE train/test is set for no arg inputs)
 '''
 
 
