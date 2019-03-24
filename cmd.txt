@@ -1,0 +1,39 @@
+git:
+---------------------------------------------------
+git branch ft-data-normalization
+git checkout ft-data-normalization
+
+
+git pull origin master
+git commit -m "message" -n
+git push origin ft-data-normalization
+
+
+
+python:
+---------------------------------------------------
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv("Datasets/star_light/train.csv", header=None)
+
+df.size
+df.shape
+df.ndim
+
+df.columns.values
+df.dtypes
+
+df.head(5)
+df.tail(5)
+
+df.index
+df[0].value_counts()
+df.set_index(0, inplace=True)
+df.index.uniqe() //.values - to np.array
+df.loc[['index']]
+
+
+df.describe()
+df.sort_value
+
