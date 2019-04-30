@@ -4,6 +4,7 @@ sys.path.append('../')    # import from folder one directory out
 import util
 import matplotlib.pyplot as plt
 import pandas as pd
+import simple_classify
 
 
 def frequency_dist(time_series, original_len):
@@ -89,7 +90,7 @@ def downsampled_df(df, reduction):
     for index, row in df.iterrows():
         down_df[count] = even_down_sample(row.values, reduction)
         count += 1
-    return pd.DataFrame(np.array(down_df))
+    return pd.DataFrame(np.array(down_df)).set_index(df.index)
 
 
 def get_distances(df, reductions):
@@ -118,10 +119,25 @@ def test_distances(df, reductions):
     plt.show()
 
 
+def test_classification(df, reductions):
+    train_df, test_df = simple_classify.split_df(df)
+    accuracies = []
+    for reduction in reductions:
+        train_down = downsampled_df(train_df, reduction)
+        test_down = downsampled_df(test_df, reduction)
+        accuracies.append(simple_classify.classify_df(train_down, test_down))
+    plt.plot(reductions, accuracies)
+    plt.xlabel('Reduction Size')
+    plt.ylabel('Test Accuracy')
+    plt.show()
+
+
 def main(df, upper_down):
-    reductions = np.linspace(1, upper_down, 8)
-    test_distances(df, reductions)
-    plot_down_sampled(df.iloc[0], reductions)
+    reductions = np.linspace(1, upper_down, 500)
+    print(reductions)
+    test_classification(df, reductions)
+    # test_distances(df, reductions)
+    # plot_down_sampled(df.iloc[0], reductions)
     bins = [10, 100, 200, 500, 1000]
     for single_bin in bins:   
         # current_mean = get_mean(df, reductions, run_down_sample_hist, single_bin)

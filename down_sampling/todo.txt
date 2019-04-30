@@ -1,0 +1,15 @@
+function that inputs data and class labels
+	does simple classification (sklearn)
+	outputs accuracy
+
+things to make alongside
+	mean accuracy of classes as the performance metric
+	split train set
+
+
+
+ideas:
+	downsample based on removing dimentions from nn accuracy?
+		might be lil bit naive and also complicaed
+
+
