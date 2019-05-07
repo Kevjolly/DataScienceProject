@@ -7,10 +7,12 @@ rc('text', usetex=True)
 rc('font', family='serif',size=12)
 
 stars = ['cepheid','eclipse_binary','RR_lyrae']
+#stars = ['RR_lyrae']
 formal = ['Cepheid', 'Eclipse Binary', 'RR Lyrae']
+#formal = ['RR Lyrae']
 star_names = {star:form for star, form in zip(stars,formal)}
 file_counts = [4586, 3633, 2172]
-#file_counts = [10, 10, 10]
+#file_counts = [27]
 
 for count, star in enumerate(stars):
     num_files = file_counts[count]
