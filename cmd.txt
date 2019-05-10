@@ -37,3 +37,4 @@ df.loc[['index']]
 df.describe()
 df.sort_value
 
+exec(open("test.py").read())

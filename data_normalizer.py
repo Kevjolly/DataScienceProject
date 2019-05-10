@@ -9,6 +9,11 @@ call this scipt with n number of filepaths to datasets
 (default of OGLE train/test is set for no arg inputs)
 '''
 
+labels = {}
+labels[1] = "Eclipsing Binary"
+labels[2] = "Cephoids"
+labels[3] = "RR Lyrae"
+
 def plot_period_std(ax, mean, std):
     ax.plot(np.linspace(0,1,len(mean)),mean+std, 'r-', alpha=0.3)
     ax.plot(np.linspace(0,1,len(mean)),mean-std, 'r-', alpha=0.3)
@@ -21,6 +26,7 @@ def plot_outliers(ax, outlier, c, alpha):
 
 def find_class_summaries(filename):
     df = util.csv_to_df(filename)
+    df = df*-1
     class_labels = util.unique_classes(df)
     print("Class labels of dataset: '"+filename+"' are: "+str(class_labels)+'\n')
     df_min, df_max = util.min_max_of_df(df)
@@ -45,7 +51,7 @@ def find_class_summaries(filename):
         outlierLowerBound = q1-1.5*iqr
         dfCOutliers = dfC[(dfC.L1>q3+1.5*iqr) | (dfC.L1<q1-1.5*iqr)]
         dfCOutliers.drop('L1', axis=1, inplace=True)
-        print("Rows:", dfC.shape[0] , ", Outliers:" , dfCOutliers.shape[0] ,'\n')
+        print(labels[class_label], " : Rows:", dfC.shape[0] , ", Outliers:" , dfCOutliers.shape[0] ,'\n')
         class_summary["mean"] = class_mean
         class_summary["outliers"] = dfCOutliers
         class_summary["outlierLowerBound"] = outlierLowerBound
@@ -97,6 +103,28 @@ def find_new_outliers(dfOutiers, mean, lB, uB):
     dfOutiers = dfOutiers[(dfOutiers.L1>uB) | (dfOutiers.L1<lB)]
     return dfOutiers.shape[0]
 
+def separate_new_outliers(dfOutiers, mean, lB, uB, fig, n, c):
+    
+    dfInit = dfOutiers
+    df_min, df_max = util.min_max_of_df(dfInit)
+    dfOutiers = dfOutiers.subtract(mean, axis=1)
+    dfOutiers = dfOutiers.abs()
+    dfOutiers["L1"] = dfOutiers.sum(axis=1)
+    dfInit["L1"] = dfOutiers["L1"]
+    dfOutiersNew = dfInit[(dfInit.L1>uB) | (dfInit.L1<lB)]
+    dfOutiersOld = dfInit[(dfInit.L1<uB) | (dfInit.L1>lB)]
+    dfInit.drop('L1', axis=1, inplace=True)
+    dfOutiersNew.drop('L1', axis=1, inplace=True)
+    dfOutiersOld.drop('L1', axis=1, inplace=True)
+
+    ax = fig.add_subplot(3, 1, n)   # count change count to using class_label: assumes classes are ordered 1-n though
+    ax.set_ylim(df_min, df_max)
+    dfOutiersOld.apply(lambda x: plot_outliers(ax, x, 'g', 1), axis=1)
+    dfOutiersNew.apply(lambda x: plot_outliers(ax, x, 'b',0.4), axis=1)
+    ax.set_title(labels[c])
+
+    
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:   # dataset not given at command line
@@ -105,7 +133,14 @@ if __name__ == '__main__':
     for dataset in sys.argv[1:]:
         class_summaries = find_class_summaries(dataset)
         for labelI in class_summaries: 
-            print(labelI, ":", end=" ")
+            print(labels[labelI], ":", end=" ")
             for labelJ, summary in class_summaries.items():
                 print(find_new_outliers(class_summaries[labelI]["outliers"], summary["mean"], summary["outlierLowerBound"], summary["outlierUpperBound"]), end=" ")
             print("\n")
+
+    fig = plt.figure()
+    plt.tight_layout(pad=3) 
+    separate_new_outliers(class_summaries[3]["outliers"], class_summaries[1]["mean"], class_summaries[1]["outlierLowerBound"], class_summaries[1]["outlierUpperBound"], fig, 1, 1)        
+    separate_new_outliers(class_summaries[1]["outliers"], class_summaries[3]["mean"], class_summaries[3]["outlierLowerBound"], class_summaries[3]["outlierUpperBound"], fig, 2, 3)
+    plt.show()
+    #plt.savefig("result.png")

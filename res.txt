@@ -1,0 +1,54 @@
+EB
+275 5
+2305 85
+sum: 2580 90 : 3.48
+
+3632 298(current method) : 8.20
+3632 64 (changed method) : 1.75
+
+
+RR
+573 33
+4754 246
+sum: 5327 279 : 5.24
+
+2171 85 (current method) : 3.91
+2171 110(changed method) : 5.066
+
+CE
+152 3
+1177 32
+sum: 1329 35 : 2.63
+
+4585 44 (current method) : 0.95
+4585 178(changed method) : 3.88
+
+
+EB						Total      Outliers 	%
+----------------------------------------------------
+Clean Data		      	2580		90			3.48
+Phased current method 	3632 		298			8.20
+Phased changed method 	3632 		64			1.75
+
+
+RR						Total      Outliers 	%
+----------------------------------------------------
+Clean Data		      	5327		279			5.24
+Phased current method 	2171 		85			3.91
+Phased changed method 	2171 		110			5.06
+
+
+CE						Total      Outliers 	%
+----------------------------------------------------
+Clean Data		      	1329		35			2.63
+Phased current method 	4585 		44			0.95
+Phased changed method 	4585 		178			3.88
+
+
+CE
+152 3
+1177 32
+sum: 1329 35 : 2.63
+
+4585 44 (current method) : 0.95
+4585 178(changed method) : 3.88
